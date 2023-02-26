@@ -106,7 +106,8 @@ class SportsWalking(Training):
         avg_speed: float = self.get_mean_speed() * self.SPEED_IN_M_S
         walk_cal_1: float = self.CT_WALK_MULTIPLIER_1 * self.weight
         walk_cal_2: float = avg_speed ** 2 / height_m
-        walk_cal_3: float = walk_cal_2 * self.CT_WALK_MULTIPLIER_2 * self.weight
+        walk_cal_3: float = walk_cal_2 * (self.CT_WALK_MULTIPLIER_2 * self.
+                                          weight)
         walk_cal: float = (walk_cal_1 + walk_cal_3) * (self.duration * super().
                                                        M_IN_HR)
         return walk_cal
@@ -149,7 +150,9 @@ class Swimming(Training):
 def read_package(workout_type: str, data: list[tuple]) -> Training:
     """Прочитать данные полученные от датчиков."""
     try:
-        training_class = {'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
+        training_class = {'SWM': Swimming,
+                          'RUN': Running,
+                          'WLK': SportsWalking}
         return training_class[workout_type](*data)
     except KeyError:
         pass
