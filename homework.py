@@ -147,7 +147,7 @@ class Swimming(Training):
         return swim_cal
 
 
-def read_package(workout_type: str, data: list[tuple[int, float]]) -> Training:
+def read_package(workout_type: str, data: list[float]) -> Training:
     """Прочитать данные полученные от датчиков."""
     try:
         training_class = {'SWM': Swimming,
@@ -168,7 +168,7 @@ def main(training: Training) -> None:
 
 
 if __name__ == '__main__':
-    packages = [
+    packages: list = [
         ('SWM', [720, 1, 80, 25, 40]),
         ('RUN', [15000, 1, 75]),
         ('WLK', [9000, 1, 75, 180]),
