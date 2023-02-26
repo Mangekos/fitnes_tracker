@@ -147,7 +147,7 @@ class Swimming(Training):
         return swim_cal
 
 
-def read_package(workout_type: str, data: list[tuple]) -> Training:
+def read_package(workout_type: str, data: list[tuple[int, float]]) -> Training:
     """Прочитать данные полученные от датчиков."""
     try:
         training_class = {'SWM': Swimming,
