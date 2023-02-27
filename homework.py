@@ -24,9 +24,9 @@ class InfoMessage:
 class Training:
     """Базовый класс тренировки."""
 
-    M_IN_KM: int = 1000
-    M_IN_HR: int = 60
-    LEN_STEP: float = 0.65
+    M_IN_KM: int = 1000  # Количество м в км
+    M_IN_HR: int = 60  # Количество минут в часе
+    LEN_STEP: float = 0.65  # Ширина шага
 
     def __init__(self,
                  action: int,
@@ -64,8 +64,8 @@ class Training:
 class Running(Training):
     """Тренировка: бег."""
 
-    CT_RUN_MULTIPLIER: int = 18
-    CT_RUN_SUMMAND: float = 1.79
+    RUN_MULTIPLIER: int = 18  # Множитель скорости
+    RUN_SHIFT: float = 1.79  # Смещение для значения средней скорости
 
     def __init__(self,
                  action: int,
@@ -76,20 +76,25 @@ class Running(Training):
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
 
-        cal_1: float = self.CT_RUN_MULTIPLIER * self.get_mean_speed()
-        cal_2: float = self.weight / super().M_IN_KM
-        cal_3: float = self.duration * super().M_IN_HR
-        run_cal: float = (cal_1 + self.CT_RUN_SUMMAND) * cal_2 * cal_3
-        return run_cal
+        return ((self.RUN_MULTIPLIER
+                * self.get_mean_speed()
+                + self.RUN_SHIFT)
+                * self.weight
+                / super().M_IN_KM
+                * (self.duration
+                   * super().M_IN_HR))
 
 
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
 
-    CT_WALK_MULTIPLIER_1: float = 0.035
-    CT_WALK_MULTIPLIER_2: float = 0.029
-    SPEED_IN_M_S: float = 0.278
-    SM_IN_M: int = 100
+    WALK_WEIGHT_MULTIPLIER: float = 0.035  # Множитель веса человека
+    WALK_SPEED_HEIGHT_MULTIPLIER: float = 0.029
+    """ WALK_SPEED_HEIGHT_MULTIPLIER -
+    Множитель деления квадрата скорости и роста человека"""
+
+    SPEED_IN_M_S: float = 0.278  # Для перeвода скорости в м/с
+    SM_IN_M: int = 100  # Для перевода роста в метры
 
     def __init__(self,
                  action: int,
@@ -102,24 +107,23 @@ class SportsWalking(Training):
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
 
-        height_m: float = self.height / self.SM_IN_M
-        avg_speed: float = self.get_mean_speed() * self.SPEED_IN_M_S
-        walk_cal_1: float = self.CT_WALK_MULTIPLIER_1 * self.weight
-        walk_cal_2: float = avg_speed ** 2 / height_m
-        walk_cal_3: float = walk_cal_2 * (self.CT_WALK_MULTIPLIER_2 * self.
-                                          weight)
-        walk_cal: float = (walk_cal_1 + walk_cal_3) * (self.duration * super().
-                                                       M_IN_HR)
-        return walk_cal
+        return ((self.WALK_WEIGHT_MULTIPLIER
+                 * self.weight
+                 + ((self.get_mean_speed()
+                     * self.SPEED_IN_M_S) ** 2
+                     / (self.height / self.SM_IN_M))
+                * self.WALK_SPEED_HEIGHT_MULTIPLIER
+                * self.weight)
+                * (self.duration
+                * super().M_IN_HR))
 
 
 class Swimming(Training):
     """Тренировка: плавание."""
 
-    LEN_STEP: float = 1.38
-    CT_SWM_SUMMAND: float = 1.1
-    CT_SWM_MULTIPLIER = 2
-    M_IN_KM = 1000
+    LEN_STEP: float = 1.38  # Длина гребка спортсмена
+    SWM_SHIFT: float = 1.1  # Смещение для значения средней скорости
+    SWM_MULTIPLIER: float = 2  # Множитель скорости
 
     def __init__(self,
                  action: int,
@@ -134,28 +138,30 @@ class Swimming(Training):
     def get_mean_speed(self) -> float:
         """Получить среднюю скорость движения."""
 
-        speed_1: float = self.length_pool * self.count_pool
-        swim_speed: float = speed_1 / super().M_IN_KM / self.duration
-        return swim_speed
+        return (self.length_pool
+                * self.count_pool
+                / super().M_IN_KM
+                / self.duration)
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
 
-        cal_1: float = self.get_mean_speed() + self.CT_SWM_SUMMAND
-        cal_2: float = self.weight * self.duration
-        swim_cal: float = cal_1 * self.CT_SWM_MULTIPLIER * cal_2
-        return swim_cal
+        return ((self.get_mean_speed()
+                 + self.SWM_SHIFT)
+                * self.SWM_MULTIPLIER
+                * self.weight
+                * self.duration)
 
 
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
     try:
-        training_class = {'SWM': Swimming,
-                          'RUN': Running,
-                          'WLK': SportsWalking}
+        training_class: dict(str, Training) = {'SWM': Swimming,
+                                               'RUN': Running,
+                                               'WLK': SportsWalking}
         return training_class[workout_type](*data)
     except KeyError:
-        pass
+        raise NotImplementedError('Не верный тип тренировки')
 
 
 def main(training: Training) -> None:
@@ -164,7 +170,7 @@ def main(training: Training) -> None:
         info: InfoMessage = training.show_training_info()
         print(info.get_message())
     except AttributeError:
-        pass
+        raise NotImplementedError('Ошибка, введены не верные данные')
 
 
 if __name__ == '__main__':
