@@ -157,7 +157,7 @@ def main(training: Training) -> 0:
 
 
 if __name__ == '__main__':
-    packages: list = [
+    packages = [
         ('SWM', [720, 1, 80, 25, 40]),
         ('RUN', [15000, 1, 75]),
         ('WLK', [9000, 1, 75, 180]),
@@ -165,4 +165,6 @@ if __name__ == '__main__':
 
     for workout_type, data in packages:
         training: Training = read_package(workout_type, data)
+        main(training)
+        training = read_package(workout_type, data)
         main(training)
