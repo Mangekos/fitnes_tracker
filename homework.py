@@ -74,9 +74,9 @@ class Running(Training):
                 * self.get_mean_speed()
                 + self.RUN_SHIFT)
                 * self.weight
-                / super().M_IN_KM
+                / self.M_IN_KM
                 * (self.duration
-                   * super().M_IN_HR))
+                   * self.M_IN_HR))
 
 
 @dataclass
@@ -104,7 +104,7 @@ class SportsWalking(Training):
                 * self.WALK_SPEED_HEIGHT_MULTIPLIER
                 * self.weight)
                 * (self.duration
-                * super().M_IN_HR))
+                * self.M_IN_HR))
 
 
 @dataclass
@@ -123,7 +123,7 @@ class Swimming(Training):
 
         return (self.length_pool
                 * self.count_pool
-                / super().M_IN_KM
+                / self.M_IN_KM
                 / self.duration)
 
     def get_spent_calories(self) -> float:
@@ -143,8 +143,8 @@ def read_package(workout_type: str, data: list) -> Training:
                                                'RUN': Running,
                                                'WLK': SportsWalking}
         return training_class[workout_type](*data)
-    except KeyError:
-        raise NotImplementedError('Не верный тип тренировки')
+    except (KeyError, TypeError) as e:
+        print('Не верный тип тренировки', e)
 
 
 def main(training: Training) -> 0:
