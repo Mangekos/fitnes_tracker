@@ -11,7 +11,7 @@
 
 ```
 git clone <ssh link>
-cd fitness_tracker_OOP
+cd fitness_tracker
 ```
 
 Cоздать и активировать виртуальное окружение:
